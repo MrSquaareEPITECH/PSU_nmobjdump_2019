@@ -20,9 +20,9 @@ typedef struct sym_type_s {
 
 const sym_type_t SYM_TYPES[] = {
     {'A', SHN_ABS, 0, 0, 0, 0, NULL},
-    {'B', 0, SHT_NOBITS, SHF_ALLOC | SHF_WRITE, 0, 0, ".bss"},
+    {'B', 0, SHT_NOBITS, SHF_ALLOC + SHF_WRITE, 0, 0, ".bss"},
     {'C', SHN_COMMON, 0, 0, 0, NULL},
-    {'D', 0, SHT_PROGBITS, SHF_ALLOC | SHF_WRITE, 0, 0, ".data"},
+    {'D', 0, SHT_PROGBITS, SHF_ALLOC + SHF_WRITE, 0, 0, ".data"},
     {'F', 0, 0, 0, 0, STT_FILE, NULL},
     {'l', 0, SHT_PROGBITS, 0, 0, 0, ".line"},
     {'G', SHN_MIPS_SCOMMON, 0, 0, 0, 0, NULL},
@@ -33,7 +33,7 @@ const sym_type_t SYM_TYPES[] = {
     {'p', 0, 0, 0, 0, 0, NULL},
     {'R', 0, SHT_PROGBITS, SHF_ALLOC, 0, 0, ".rodata"},
     {'S', SHN_MIPS_SUNDEFINED, 0, 0, 0, 0, NULL},
-    {'T', 0, SHT_PROGBITS, SHF_ALLOC | SHF_EXECINSTR, 0, 0, ".text"},
+    {'T', 0, SHT_PROGBITS, SHF_ALLOC + SHF_EXECINSTR, 0, 0, ".text"},
     {'U', SHN_UNDEF, 0, 0, 0, 0, NULL},
     {'V', 0, 0, 0, STB_WEAK, 0, NULL},
     {'W', SHN_UNDEF, 0, 0, STB_WEAK, 0, NULL},

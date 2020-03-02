@@ -50,6 +50,49 @@ char *symbol_alpha(char *symbol)
     return symbol_alpha;
 }
 
+char symbol_letter(Elf64_Shdr *secHdrTable, Elf64_Sym *sym)
+{
+    if (sym->st_shndx == SHN_MIPS_SCOMMON) return ('G');
+    if (sym->st_shndx == SHN_MIPS_SUNDEFINED) return ('S');
+    // if ((sym->st_shndx == SHN_UNDEF) && (ELF64_ST_BIND(sym->st_info) == STB_WEAK))
+    //    return ('W');
+    // if (ELF64_ST_BIND(sym->st_info) == STB_WEAK) return ('V');
+    if (ELF64_ST_BIND(sym->st_info) == STB_WEAK) {
+        if (sym->st_value)
+            return ('W');
+        return ('w');
+    }
+    if (ELF64_ST_TYPE(sym->st_info) == STT_FILE) return ('F');
+    if (ELF64_ST_TYPE(sym->st_info) == STT_GNU_IFUNC) return ('I');
+    if (sym->st_shndx == SHN_ABS) return ('A');
+    if (sym->st_shndx == SHN_COMMON) return ('C');
+    if (sym->st_shndx == SHN_UNDEF) return ('U');
+
+    Elf64_Shdr *symSecHdr = &secHdrTable[sym->st_shndx];
+
+    if ((symSecHdr->sh_type == SHT_NOBITS) &&
+        (symSecHdr->sh_flags == (SHF_ALLOC + SHF_WRITE)))
+        return ('B');
+    if ((symSecHdr->sh_flags == (SHF_ALLOC + SHF_WRITE)))
+        return ('D');
+    if ((symSecHdr->sh_type == SHT_PROGBITS) &&
+        (symSecHdr->sh_flags == (SHF_ALLOC)))
+        return ('R');
+    if ((symSecHdr->sh_type == SHT_PROGBITS) &&
+        (symSecHdr->sh_flags == (SHF_ALLOC + SHF_EXECINSTR)))
+        return ('T');
+    return ('?');
+}
+
+char symbol_type(Elf64_Shdr *secHdrTable, Elf64_Sym *sym)
+{
+    int letter = symbol_letter(secHdrTable, sym);
+
+    if (ELF64_ST_BIND(sym->st_info) == STB_LOCAL)
+        letter = tolower(letter);
+    return (char)(letter);
+}
+
 void symbols_sort(char **symbols, char **symbols_alpha, unsigned int length)
 {
     for (unsigned int i = 1; i < length; ++i) {
@@ -76,23 +119,25 @@ void symbols_sort(char **symbols, char **symbols_alpha, unsigned int length)
 int strcmp_alpha(const char *s1, const char *s2)
 {
     unsigned long len1 = strlen(s1), len2 = strlen(s2);
+    unsigned long i = 0, j = 0;
 
-    for (unsigned long i = 0, j = 0; (i < len1) && (j < len2); ++i, ++j) {
+    for (; (i < len1) && (j < len2); ++i, ++j) {
         while (!isalpha(s1[i]) && (i < len1)) i++;
         while (!isalpha(s2[j]) && (j < len2)) j++;
 
         if (s1[i] != s2[j]) return (s1[i] - s2[j]);
     }
 
-    return (0);
+    return (s1[i] - s2[j]);
 }
 
 int strcasecmp_alpha(const char *s1, const char *s2)
 {
     unsigned long len1 = strlen(s1), len2 = strlen(s2);
+    unsigned long i = 0, j = 0;
     int c1 = 0, c2 = 0;
 
-    for (unsigned long i = 0, j = 0; (i < len1) && (j < len2); ++i, ++j) {
+    for (; (i < len1) && (j < len2); ++i, ++j) {
         while (!isalpha(s1[i]) && (i < len1)) i++;
         while (!isalpha(s2[j]) && (j < len2)) j++;
 
@@ -102,7 +147,7 @@ int strcasecmp_alpha(const char *s1, const char *s2)
         if (c1 != c2) return (c1 - c2);
     }
 
-    return (0);
+    return (s1[i] - s2[j]);
 }
 
 void symbols_idx_sort(
@@ -143,9 +188,9 @@ int elf64(Elf64_Ehdr *elfHdr)
     printf("shstrtab:\n");
 
     for (unsigned int i = 0; i < elfHdr->e_shnum; ++i) {
-        Elf64_Shdr secHdr = secHdrTable[i];
+        Elf64_Shdr *secHdr = &secHdrTable[i];
 
-        if (secHdr.sh_name) printf("%s\n", &shstrtab[secHdr.sh_name]);
+        if (secHdr->sh_name) printf("%s\n", &shstrtab[secHdr->sh_name]);
     }
 
     printf("\n");
@@ -165,12 +210,11 @@ int elf64(Elf64_Ehdr *elfHdr)
 
     unsigned int symNum = symtabHdr->sh_size / symtabHdr->sh_entsize;
     unsigned int real_num = 0;
-    Elf64_Sym sym;
 
     for (unsigned int i = 0; i < symNum; ++i) {
-        sym = symtab[i];
+        Elf64_Sym *sym = &symtab[i];
 
-        real_num += ((sym.st_name != 0) && (sym.st_info != STT_FILE));
+        real_num += ((sym->st_name != 0) && (sym->st_info != STT_FILE));
     }
 
     char **symbols = malloc(sizeof(char *) * real_num);
@@ -204,11 +248,11 @@ int elf64(Elf64_Ehdr *elfHdr)
     memset(symbols_idx, 0, real_num);
 
     for (unsigned int i = 0, j = 0; i < symNum; ++i) {
-        sym = symtab[i];
+        Elf64_Sym *sym = &symtab[i];
 
-        if ((sym.st_name != 0) && (sym.st_info != STT_FILE)) {
-            symbols[j] = strdup(&strtab[sym.st_name]);
-            symbols_alpha[j] = symbol_alpha(&strtab[sym.st_name]);
+        if ((sym->st_name != 0) && (sym->st_info != STT_FILE)) {
+            symbols[j] = strdup(&strtab[sym->st_name]);
+            symbols_alpha[j] = symbol_alpha(&strtab[sym->st_name]);
             symbols_idx[j] = (int)(i);
 
             j++;
@@ -225,12 +269,26 @@ int elf64(Elf64_Ehdr *elfHdr)
 
     printf("\n");
 
-    printf("No malloc sort:\n");
+    printf("Single malloc sort:\n");
 
     for (unsigned int i = 0; i < real_num; ++i) {
-        sym = symtab[symbols_idx[i]];
+        Elf64_Sym *sym = &symtab[symbols_idx[i]];
 
-        printf("%s\n", &strtab[sym.st_name]);
+        printf("%s\n", &strtab[sym->st_name]);
+    }
+
+    printf("\n");
+
+    printf("nm-like:\n");
+
+    for (unsigned int i = 0; i < real_num; ++i) {
+        Elf64_Sym *sym = &symtab[symbols_idx[i]];
+        char type = symbol_type(secHdrTable, sym);
+
+        if (sym->st_value)
+            printf("%.16lx %c %s\n", sym->st_value, type, &strtab[sym->st_name]);
+        else
+            printf("%16c %c %s\n", ' ', type, &strtab[sym->st_name]);
     }
 
     printf("\n");
