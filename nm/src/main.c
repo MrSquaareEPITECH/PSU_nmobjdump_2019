@@ -134,11 +134,24 @@ void symbols_idx_sort(
 
 int elf64(Elf64_Ehdr *elfHdr)
 {
-    Elf64_Shdr *secHdr = PTR_CREMENT(elfHdr, elfHdr->e_shoff);
+    Elf64_Shdr *secHdrTable = PTR_CREMENT(elfHdr, elfHdr->e_shoff);
+    Elf64_Shdr *shstrHdr = &secHdrTable[elfHdr->e_shstrndx];
     Elf64_Shdr *symtabHdr = NULL;
 
+    char *shstrtab = PTR_CREMENT(elfHdr, shstrHdr->sh_offset);
+
+    printf("shstrtab:\n");
+
+    for (unsigned int i = 0; i < elfHdr->e_shnum; ++i) {
+        Elf64_Shdr secHdr = secHdrTable[i];
+
+        if (secHdr.sh_name) printf("%s\n", &shstrtab[secHdr.sh_name]);
+    }
+
+    printf("\n");
+
     for (int i = 0; !symtabHdr && (i < elfHdr->e_shnum); ++i)
-        if (secHdr[i].sh_type == SHT_SYMTAB) symtabHdr = secHdr + i;
+        if (secHdrTable[i].sh_type == SHT_SYMTAB) symtabHdr = &secHdrTable[i];
 
     if (!symtabHdr) {
         fprintf(stderr, ".symtab header not found.");
@@ -146,15 +159,15 @@ int elf64(Elf64_Ehdr *elfHdr)
         return 84;
     }
 
-    Elf64_Shdr *symtabLink = secHdr + symtabHdr->sh_link;
+    Elf64_Shdr *symtabLink = &secHdrTable[symtabHdr->sh_link];
     Elf64_Sym *symtab = PTR_CREMENT(elfHdr, symtabHdr->sh_offset);
     char *strtab = PTR_CREMENT(elfHdr, symtabLink->sh_offset);
 
-    unsigned int num = symtabHdr->sh_size / symtabHdr->sh_entsize;
+    unsigned int symNum = symtabHdr->sh_size / symtabHdr->sh_entsize;
     unsigned int real_num = 0;
     Elf64_Sym sym;
 
-    for (unsigned int i = 0; i < num; ++i) {
+    for (unsigned int i = 0; i < symNum; ++i) {
         sym = symtab[i];
 
         real_num += ((sym.st_name != 0) && (sym.st_info != STT_FILE));
@@ -190,15 +203,13 @@ int elf64(Elf64_Ehdr *elfHdr)
 
     memset(symbols_idx, 0, real_num);
 
-    for (unsigned int i = 0, j = 0; i < num; ++i) {
+    for (unsigned int i = 0, j = 0; i < symNum; ++i) {
         sym = symtab[i];
 
         if ((sym.st_name != 0) && (sym.st_info != STT_FILE)) {
             symbols[j] = strdup(&strtab[sym.st_name]);
             symbols_alpha[j] = symbol_alpha(&strtab[sym.st_name]);
             symbols_idx[j] = (int)(i);
-
-            secHdr->sh_type
 
             j++;
         }
@@ -207,15 +218,22 @@ int elf64(Elf64_Ehdr *elfHdr)
     symbols_sort(symbols, symbols_alpha, real_num);
     symbols_idx_sort(symtab, strtab, symbols_idx, real_num);
 
-    for (unsigned int i = 0; i < real_num; ++i) {
+    printf("Malloc sort:\n");
+
+    for (unsigned int i = 0; i < real_num; ++i)
         if (symbols[i]) printf("%s\n", symbols[i]);
-    }
+
+    printf("\n");
+
+    printf("No malloc sort:\n");
 
     for (unsigned int i = 0; i < real_num; ++i) {
         sym = symtab[symbols_idx[i]];
 
-        printf("sym: %s\n", &strtab[sym.st_name]);
+        printf("%s\n", &strtab[sym.st_name]);
     }
+
+    printf("\n");
 
     return 0;
 }
