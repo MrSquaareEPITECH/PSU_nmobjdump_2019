@@ -16,6 +16,7 @@
 #include <unistd.h>
 
 #include "def.h"
+#include "struct.h"
 
 int elf32(Elf32_Ehdr *ehdr)
 {
@@ -196,6 +197,8 @@ int elf64(Elf64_Ehdr *elfHdr)
             symbols[j] = strdup(&strtab[sym.st_name]);
             symbols_alpha[j] = symbol_alpha(&strtab[sym.st_name]);
             symbols_idx[j] = (int)(i);
+
+            secHdr->sh_type
 
             j++;
         }
