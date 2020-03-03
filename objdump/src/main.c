@@ -5,6 +5,7 @@
 ** main.c
 */
 
+#include <bfd.h>
 #include <ctype.h>
 #include <elf.h>
 #include <fcntl.h>
@@ -25,6 +26,14 @@ int elf32(Elf32_Ehdr *ehdr)
     return 0;
 }
 
+char *elf_machine_isa(Elf64_Half e_machine)
+{
+    for (int i = 0; ELF_MACHINE_ISA[i].str != NULL; ++i)
+        if (ELF_MACHINE_ISA[i].e_machine == e_machine)
+            return ELF_MACHINE_ISA[i].str;
+    return (ELF_MACHINE_ISA->str);
+}
+
 void section_print(Elf64_Shdr *secHdr, Elf64_Ehdr *elfHdr, char *shstrtab)
 {
     printf("Contents of section %s:", &shstrtab[secHdr->sh_name]);
@@ -36,7 +45,7 @@ void section_print(Elf64_Shdr *secHdr, Elf64_Ehdr *elfHdr, char *shstrtab)
         if ((i % 16) == 0) {
             printf("\n");
 
-            printf(" %.4lx", secHdr->sh_offset + i);
+            printf(" %.4lx", secHdr->sh_addr + i);
         }
 
         for (int j = 0; (j < 16); ++j) {
@@ -45,6 +54,8 @@ void section_print(Elf64_Shdr *secHdr, Elf64_Ehdr *elfHdr, char *shstrtab)
             if ((i + j) < secHdr->sh_size) {
                 if (content[i + j] > 0)
                     printf("%.2x", content[i + j]);
+                else if (content[i + j] < 0)
+                    printf("%.2x", 256 + content[i + j]);
                 else
                     printf("00");
             } else {
@@ -54,18 +65,22 @@ void section_print(Elf64_Shdr *secHdr, Elf64_Ehdr *elfHdr, char *shstrtab)
 
         printf("  ");
 
-        for (int j = 0; (j < 16) && ((i + j) < secHdr->sh_size); ++j) {
-            if (isprint(content[i + j]))
-                printf("%c", content[i + j]);
-            else
-                printf(".");
+        for (int j = 0; (j < 16); ++j) {
+            if ((i + j) < secHdr->sh_size) {
+                if (isprint(content[i + j]))
+                    printf("%c", content[i + j]);
+                else
+                    printf(".");
+            } else {
+                printf(" ");
+            }
         }
     }
 
     printf("\n");
 }
 
-int elf64(Elf64_Ehdr *elfHdr)
+int elf64(char *path, Elf64_Ehdr *elfHdr)
 {
     Elf64_Shdr *secHdrTable = PTR_CREMENT(elfHdr, elfHdr->e_shoff);
     Elf64_Shdr *shstrHdr = &secHdrTable[elfHdr->e_shstrndx];
@@ -79,6 +94,12 @@ int elf64(Elf64_Ehdr *elfHdr)
         if (secHdr->sh_name) printf("%s\n", &shstrtab[secHdr->sh_name]);
     }
 
+    printf("\n");
+
+    printf("objdump-like:\n");
+
+    printf("%s:     file format elf64-x86-64\n", path);
+    printf("start address 0x%.16lx\n", elfHdr->e_entry);
     printf("\n");
 
     for (unsigned int i = 0; i < elfHdr->e_shnum; ++i) {
@@ -95,6 +116,8 @@ int elf64(Elf64_Ehdr *elfHdr)
 
         section_print(secHdr, elfHdr, shstrtab);
     }
+
+    printf("\n");
 
     return 0;
 }
@@ -126,7 +149,7 @@ int main(int argc, char **argv)
     if (*arch == 1)
         elf32((Elf32_Ehdr *)(buffer));
     else if (*arch == 2)
-        elf64((Elf64_Ehdr *)(buffer));
+        elf64(argv[1], (Elf64_Ehdr *)(buffer));
 
     munmap(buffer, stat.st_size);
     close(fd);
