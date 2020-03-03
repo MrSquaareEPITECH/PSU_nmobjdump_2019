@@ -34,6 +34,31 @@ char *elf_machine_isa(Elf64_Half e_machine)
     return (ELF_MACHINE_ISA->str);
 }
 
+unsigned long elf_flags(
+    Elf64_Ehdr *elfHdr, Elf64_Shdr *secHdrTable, char *shstrtab)
+{
+    unsigned long flags = 0;
+
+    if (elfHdr->e_type == ET_REL) flags += HAS_RELOC;
+    if (elfHdr->e_type == ET_EXEC) flags += EXEC_P;
+    if (elfHdr->e_type == ET_DYN) flags += DYNAMIC;
+
+    for (unsigned int i = 0; i < elfHdr->e_shnum; ++i) {
+        Elf64_Shdr *secHdr = &secHdrTable[i];
+
+        if (secHdr->sh_name == 0) continue;
+
+        char *str = &shstrtab[secHdr->sh_name];
+
+        if (strcmp(str, ".debug") == 0) flags += HAS_DEBUG;
+        if (strcmp(str, ".symtab") == 0) flags += HAS_SYMS;
+    }
+
+    if (elfHdr->e_phoff) flags += D_PAGED;
+
+    return flags;
+}
+
 void section_print(Elf64_Shdr *secHdr, Elf64_Ehdr *elfHdr, char *shstrtab)
 {
     printf("Contents of section %s:", &shstrtab[secHdr->sh_name]);
@@ -98,7 +123,23 @@ int elf64(char *path, Elf64_Ehdr *elfHdr)
 
     printf("objdump-like:\n");
 
+    unsigned long flags = elf_flags(elfHdr, secHdrTable, shstrtab);
+
     printf("%s:     file format elf64-x86-64\n", path);
+    printf("architecture: %s, flags 0x%.8lx:\n",
+        elf_machine_isa(elfHdr->e_machine), flags);
+
+    char print = 0;
+
+    for (int i = 0; BFD_FLAGS[i].str; ++i) {
+        if (flags & BFD_FLAGS[i].flag) {
+            if (print) printf(", ");
+            printf("%s", BFD_FLAGS[i].str);
+            print = 1;
+        }
+    }
+
+    printf("\n");
     printf("start address 0x%.16lx\n", elfHdr->e_entry);
     printf("\n");
 
