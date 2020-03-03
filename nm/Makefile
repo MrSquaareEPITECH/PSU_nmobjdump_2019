@@ -35,8 +35,6 @@ PROJ_SRC			=		32/elf_32.c					\
 							64/symbol_table_64.c		\
 							common/file.c				\
 
-TEST_SRC			=		test_src.c		\
-
 CFLAGS				+=		-I $(INCL_DIR)
 CFLAGS				+=		-W -Wall -Wextra
 
