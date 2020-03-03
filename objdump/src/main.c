@@ -33,8 +33,12 @@ void section_print(Elf64_Shdr *secHdr, Elf64_Ehdr *elfHdr, char *shstrtab)
     unsigned int i = 0;
 
     for (; i < secHdr->sh_size; ++i) {
-        if ((i % 16) == 0)
+        if ((i % 16) == 0) {
             printf("\n");
+
+            printf(" %.4lx ", secHdr->sh_offset + i);
+        }
+
         if (isprint(content[i]))
             printf("%c", content[i]);
         else
@@ -62,6 +66,9 @@ int elf64(Elf64_Ehdr *elfHdr)
 
     for (unsigned int i = 0; i < elfHdr->e_shnum; ++i) {
         Elf64_Shdr *secHdr = &secHdrTable[i];
+
+        if (secHdr->sh_name == 0) continue;
+
         char *secStr = &shstrtab[secHdr->sh_name];
 
         if (strcmp(secStr, ".bss") == 0) continue;
