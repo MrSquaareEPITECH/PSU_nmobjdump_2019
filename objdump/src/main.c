@@ -25,9 +25,23 @@ int elf32(Elf32_Ehdr *ehdr)
     return 0;
 }
 
-void section_print(Elf64_Shdr *secHdr, char *shstrtab)
+void section_print(Elf64_Shdr *secHdr, Elf64_Ehdr *elfHdr, char *shstrtab)
 {
-    printf("Contents of section %s:\n", &shstrtab[secHdr->sh_name]);
+    printf("Contents of section %s:", &shstrtab[secHdr->sh_name]);
+
+    char *content = PTR_CREMENT(elfHdr, secHdr->sh_offset);
+    unsigned int i = 0;
+
+    for (; i < secHdr->sh_size; ++i) {
+        if ((i % 16) == 0)
+            printf("\n");
+        if (isprint(content[i]))
+            printf("%c", content[i]);
+        else
+            printf(".");
+    }
+
+    printf("\n");
 }
 
 int elf64(Elf64_Ehdr *elfHdr)
@@ -48,14 +62,14 @@ int elf64(Elf64_Ehdr *elfHdr)
 
     for (unsigned int i = 0; i < elfHdr->e_shnum; ++i) {
         Elf64_Shdr *secHdr = &secHdrTable[i];
-        char *secStr =  &shstrtab[secHdr->sh_name];
+        char *secStr = &shstrtab[secHdr->sh_name];
 
         if (strcmp(secStr, ".bss") == 0) continue;
         if (strcmp(secStr, ".shstrtab") == 0) continue;
         if (strcmp(secStr, ".strtab") == 0) continue;
         if (strcmp(secStr, ".symtab") == 0) continue;
 
-        section_print(secHdr, shstrtab);
+        section_print(secHdr, elfHdr, shstrtab);
     }
 
     return 0;
