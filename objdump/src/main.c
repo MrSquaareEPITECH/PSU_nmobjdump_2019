@@ -32,17 +32,34 @@ void section_print(Elf64_Shdr *secHdr, Elf64_Ehdr *elfHdr, char *shstrtab)
     char *content = PTR_CREMENT(elfHdr, secHdr->sh_offset);
     unsigned int i = 0;
 
-    for (; i < secHdr->sh_size; ++i) {
+    for (; i < secHdr->sh_size; i += 16) {
         if ((i % 16) == 0) {
             printf("\n");
 
-            printf(" %.4lx ", secHdr->sh_offset + i);
+            printf(" %.4lx", secHdr->sh_offset + i);
         }
 
-        if (isprint(content[i]))
-            printf("%c", content[i]);
-        else
-            printf(".");
+        for (int j = 0; (j < 16); ++j) {
+            if ((j % 4) == 0) printf(" ");
+
+            if ((i + j) < secHdr->sh_size) {
+                if (content[i + j] > 0)
+                    printf("%.2x", content[i + j]);
+                else
+                    printf("00");
+            } else {
+                printf("  ");
+            }
+        }
+
+        printf("  ");
+
+        for (int j = 0; (j < 16) && ((i + j) < secHdr->sh_size); ++j) {
+            if (isprint(content[i + j]))
+                printf("%c", content[i + j]);
+            else
+                printf(".");
+        }
     }
 
     printf("\n");
