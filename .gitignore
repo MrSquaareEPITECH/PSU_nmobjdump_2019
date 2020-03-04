@@ -9,6 +9,9 @@ my_objdump
 *.gcda
 *.gcno
 
+# Scripts
+docker.sh
+
 # Resources
 resources/
 
