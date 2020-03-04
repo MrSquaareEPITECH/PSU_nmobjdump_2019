@@ -10,6 +10,6 @@
 
 #include <elf.h>
 
-int nm_32(Elf32_Ehdr *elf_header);
+int nm_32(const char *path, Elf32_Ehdr *elf_header);
 
 #endif  // NM_NM_32_H

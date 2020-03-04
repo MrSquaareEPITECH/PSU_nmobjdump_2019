@@ -7,12 +7,20 @@
 
 #include "nm_64.h"
 
-#include <stddef.h>
+#include <stdio.h>
 
+#include "../common/def.h"
+#include "elf_64.h"
 #include "symbol_table_64.h"
 
-int nm_64(Elf64_Ehdr *elf_header)
+int nm_64(const char *path, Elf64_Ehdr *elf_header)
 {
+    if (elf_64_get_section_header_by_name(elf_header, ".symtab") == NULL) {
+        fprintf(stderr, "nm: %s: no symbols\n", path);
+
+        return (FAILURE);
+    }
+
     int *indexes = NULL;
     unsigned long size;
 

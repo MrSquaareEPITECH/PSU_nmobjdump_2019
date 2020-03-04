@@ -21,13 +21,13 @@
 int buffer_errors(char *path, char *buffer)
 {
     if (file_is_elf(buffer) == false) {
-        printf("nm: %s: file format not recognized\n", path);
+        fprintf(stderr, "nm: %s: file format not recognized\n", path);
 
         return (FAILURE);
     }
 
     if (file_get_arch(buffer) == ARCH_UNKNOWN) {
-        printf("nm: %s: file arch not recognized\n", path);
+        fprintf(stderr, "nm: %s: file arch not recognized\n", path);
 
         return (FAILURE);
     }
@@ -40,7 +40,7 @@ int buffer_load(char *path, char **buffer, unsigned long *size)
     int fd = open(path, O_RDONLY);
 
     if (fd == -1) {
-        printf("nm: '%s': %s\n", path, strerror(errno));
+        fprintf(stderr, "nm: '%s': %s\n", path, strerror(errno));
         return (FAILURE);
     }
 
@@ -48,7 +48,7 @@ int buffer_load(char *path, char **buffer, unsigned long *size)
     int fs = fstat(fd, &stat);
 
     if (fs == -1) {
-        printf("nm: '%s': %s\n", path, strerror(errno));
+        fprintf(stderr, "nm: '%s': %s\n", path, strerror(errno));
         return (FAILURE);
     }
 
@@ -56,7 +56,7 @@ int buffer_load(char *path, char **buffer, unsigned long *size)
     *size = stat.st_size;
 
     if (buffer == MAP_FAILED) {
-        printf("nm: '%s': %s\n", path, strerror(errno));
+        fprintf(stderr, "nm: '%s': %s\n", path, strerror(errno));
         return (FAILURE);
     }
 
@@ -101,9 +101,9 @@ int main(int argc, char **argv)
         }
 
         if (arch == ARCH_32)
-            nm_32((Elf32_Ehdr *)(buffer));
+            nm_32(argv[i], (Elf32_Ehdr *)(buffer));
         else if (arch == ARCH_64)
-            nm_64((Elf64_Ehdr *)(buffer));
+            nm_64(argv[i], (Elf64_Ehdr *)(buffer));
 
         munmap(buffer, size);
     }
