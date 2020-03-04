@@ -32,6 +32,9 @@ static char symbol_64_get_letter(
     if (strcmp(sec_str, ".data") == 0) return ('D');
     if (strcmp(sec_str, ".data1") == 0) return ('D');
     if (strcmp(sec_str, ".debug") == 0) return ('N');
+    if (strcmp(sec_str, ".fini_array") == 0) return ('T');
+    if (strcmp(sec_str, ".init") == 0) return ('T');
+    if (strcmp(sec_str, ".init_array") == 0) return ('T');
     if (strcmp(sec_str, ".rodata") == 0) return ('R');
     if (strcmp(sec_str, ".rodata1") == 0) return ('R');
     if (strcmp(sec_str, ".text") == 0) return ('T');

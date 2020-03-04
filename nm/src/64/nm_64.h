@@ -10,6 +10,6 @@
 
 #include <elf.h>
 
-int nm_64(Elf64_Ehdr *elf_header);
+int nm_64(const char *path, Elf64_Ehdr *elf_header);
 
 #endif  // NM_NM_64_H
