@@ -28,5 +28,5 @@ int nm_64(const char *path, Elf64_Ehdr *elf_header)
     symbol_table_64_sort_indexes_alphabetically(elf_header, indexes, size);
     symbol_table_64_print(elf_header, indexes, size);
 
-    return (0);
+    return (SUCCESS);
 }
