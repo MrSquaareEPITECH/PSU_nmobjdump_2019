@@ -22,8 +22,8 @@ static int strcasecmp_alpha(const char *s1, const char *s2)
     unsigned long i = 0, j = 0;
 
     for (; (i < len1) && (j < len2); ++i, ++j) {
-        while (!isalpha(s1[i]) && (i < len1)) i++;
-        while (!isalpha(s2[j]) && (j < len2)) j++;
+        while (!isalnum(s1[i]) && (i < len1)) i++;
+        while (!isalnum(s2[j]) && (j < len2)) j++;
 
         int c1 = tolower(s1[i]);
         int c2 = tolower(s2[j]);
