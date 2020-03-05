@@ -7,10 +7,15 @@
 
 #include "section_64.h"
 
+#include <stddef.h>
+
 #include "../common/def.h"
 
 char *section_64_get_name(const Elf64_Shdr *sec_hdr, const Elf64_Ehdr *elf_hdr)
 {
+    if (sec_hdr->sh_name == 0)
+        return (NULL);
+
     Elf64_Shdr *sec_hdr_table = PTR_CREMENT(elf_hdr, elf_hdr->e_shoff);
     Elf64_Shdr *shstr_hdr = &sec_hdr_table[elf_hdr->e_shstrndx];
     char *shstr_table = PTR_CREMENT(elf_hdr, shstr_hdr->sh_offset);
