@@ -21,9 +21,14 @@ Elf32_Shdr *elf_32_get_section_header_by_name(
 
     for (int i = 0; i < elf_hdr->e_shnum; ++i) {
         sec_hdr = &sec_hdr_table[i];
+
+        if (sec_hdr->sh_name == 0)
+            continue;
+
         sec_str = section_32_get_name(sec_hdr, elf_hdr);
 
-        if (strcmp(sec_str, name) == 0) return (sec_hdr);
+        if (strcmp(sec_str, name) == 0)
+            return (sec_hdr);
     }
 
     return (NULL);
@@ -38,7 +43,8 @@ Elf32_Shdr *elf_32_get_section_header_by_type(
     for (int i = 0; i < elf_hdr->e_shnum; ++i) {
         sec_hdr = &sec_hdr_table[i];
 
-        if (sec_hdr->sh_type == type) return (sec_hdr);
+        if (sec_hdr->sh_type == type)
+            return (sec_hdr);
     }
 
     return (NULL);
