@@ -34,6 +34,7 @@ PROJ_SRC			=		32/elf_32.c					\
 							64/symbol_64.c				\
 							64/symbol_table_64.c		\
 							common/file.c				\
+							common/struct.c				\
 
 CFLAGS				+=		-I $(INCL_DIR)
 CFLAGS				+=		-W -Wall -Wextra
