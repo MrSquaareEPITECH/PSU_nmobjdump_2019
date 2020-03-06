@@ -8,6 +8,7 @@
 #include "nm_32.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "../common/def.h"
 #include "elf_32.h"
@@ -27,6 +28,8 @@ int nm_32(const char *path, Elf32_Ehdr *elf_header)
     symbol_table_32_get_indexes(elf_header, &indexes, &size);
     symbol_table_32_sort_indexes_alphabetically(elf_header, indexes, size);
     symbol_table_32_print(elf_header, indexes, size);
+
+    free(indexes);
 
     return (SUCCESS);
 }
