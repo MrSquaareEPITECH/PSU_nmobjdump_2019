@@ -104,34 +104,6 @@ $(LIB_NAME):		$(PROJ_OBJ)
 					&& echo "$(GREEN_B_COLOR)$(LIB_NAME) successfully created$(NO_COLOR)" \
 					|| { echo "$(RED_B_COLOR)$(LIB_NAME) couldn't be created$(NO_COLOR)"; exit 1; }
 
-lib:				$(LIB_NAME)
-
-lib_clean:
-					$(RM) $(PROJ_OBJ)
-
-lib_fclean:			lib_clean
-					$(RM) $(LIB_NAME)
-
-lib_re:				lib_fclean lib
-
-lib_sweet:			lib lib_clean
-
-$(LIB_ST_NAME):		$(PROJ_OBJ)
-					$(AR) $(LIB_ST_NAME) $(PROJ_OBJ) \
-					&& echo "$(GREEN_B_COLOR)$(LIB_ST_NAME) successfully created$(NO_COLOR)" \
-					|| { echo "$(RED_B_COLOR)$(LIB_ST_NAME) couldn't be created$(NO_COLOR)"; exit 1; }
-
-lib_st:				$(LIB_ST_NAME)
-
-lib_st_clean:		lib_clean
-
-lib_st_fclean:		lib_st_clean
-					$(RM) $(LIB_ST_NAME)
-
-lib_st_re:			lib_st_fclean lib_st
-
-lib_st_sweet:		lib_st lib_st_clean
-
 $(TEST_NAME):		CFLAGS += -fprofile-arcs -ftest-coverage
 $(TEST_NAME):		LDLIBS += -lgcov -lcriterion
 $(TEST_NAME):		$(PROJ_OBJ) $(TEST_OBJ)
@@ -170,11 +142,11 @@ tests_sh:			re
 						|| { echo "$(RED_B_COLOR)Functional tests did not pass successfully$(NO_COLOR)"; exit 1; } \
 					fi
 
-full:				all lib lib_st
+full:				all
 
-full_clean:			clean lib_clean lib_st_clean tests_clean
+full_clean:			clean tests_clean
 
-full_fclean:		fclean lib_fclean lib_st_fclean tests_fclean
+full_fclean:		fclean tests_fclean
 
 full_re:			full_fclean full
 
@@ -182,7 +154,5 @@ full_sweet:			full full_clean
 
 .PHONY:				all clean fclean re sweet											\
 					debug debug_re debug_sweet											\
-					lib lib_clean lib_fclean lib_re lib_sweet							\
-					lib_st lib_st_clean lib_st_fclean lib_st_re lib_st_sweet			\
 					tests_run tests_clean tests_fclean tests_re tests_sweet tests_sh	\
 					full full_clean full_fclean full_re full_sweet						\

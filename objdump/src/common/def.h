@@ -1,16 +1,16 @@
 /*
 ** EPITECH PROJECT, 2020
-** nm
+** objdump
 ** File description:
 ** utils.h
 */
 
-#ifndef NM_DEF_H
-#define NM_DEF_H
+#ifndef OBJDUMP_DEF_H
+#define OBJDUMP_DEF_H
 
 #define PTR_CREMENT(ptr, i) ((void *)((char *)(ptr) + (i)))
 
 #define SUCCESS (0)
 #define FAILURE (84)
 
-#endif  // NM_DEF_H
+#endif  // OBJDUMP_DEF_H
