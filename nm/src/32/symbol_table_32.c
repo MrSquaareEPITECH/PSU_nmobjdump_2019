@@ -99,8 +99,8 @@ void symbol_table_32_print(
         char type = symbol_32_get_type(sym, elf_hdr);
         const char *str = &str_table[sym->st_name];
 
-        if (sym->st_value)
-            printf("%.16lx %c %s\n", sym->st_value, type, str);
+        if ((type != 'U') && (type != 'w'))
+            printf("%.16x %c %s\n", sym->st_value, type, str);
         else
             printf("%16c %c %s\n", ' ', type, str);
     }
