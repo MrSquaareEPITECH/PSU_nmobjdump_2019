@@ -20,7 +20,8 @@ static void section_32_print_addr(const Elf32_Shdr *sec_hdr, unsigned long i)
     for (; max_addr; ++zeros, max_addr /= 0xf)
         ;
 
-    if (zeros < 4) zeros = 4;
+    if (zeros < 4)
+        zeros = 4;
 
     printf(" %.*lx", zeros, sec_hdr->sh_addr + i);
 }
@@ -31,7 +32,8 @@ static void section_32_print_hexa(
     char *content = PTR_CREMENT(elf_hdr, sec_hdr->sh_offset);
 
     for (int j = 0; (j < 16); ++j) {
-        if ((j % 4) == 0) printf(" ");
+        if ((j % 4) == 0)
+            printf(" ");
 
         if ((i + j) < sec_hdr->sh_size) {
             if (content[i + j] > 0)

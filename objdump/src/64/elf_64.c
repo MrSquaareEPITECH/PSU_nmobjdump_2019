@@ -25,29 +25,36 @@ static void elf_64_architecture(const Elf64_Ehdr *elf_hdr, char **architecture)
     }
 }
 
+static void elf_64_flags_value_sec(
+    const Elf64_Ehdr *elf_hdr, unsigned long *value, const Elf64_Shdr *sec_hdr)
+{
+    for (int j = 0; ELF_SEC_TYPE_FLAGS[j].flag; ++j)
+        if ((sec_hdr->sh_type == ELF_SEC_TYPE_FLAGS[j].sh_type) &&
+            !(*value & ELF_SEC_TYPE_FLAGS[j].flag))
+            *value += ELF_SEC_TYPE_FLAGS[j].flag;
+
+    if (sec_hdr->sh_name == 0)
+        return;
+
+    char *sec_str = section_64_get_name(sec_hdr, elf_hdr);
+
+    for (int j = 0; ELF_SEC_NAME_FLAGS[j].flag; ++j)
+        if (strcmp(sec_str, ELF_SEC_NAME_FLAGS[j].name) == 0)
+            *value += ELF_SEC_NAME_FLAGS[j].flag;
+}
+
 static void elf_64_flags_value(const Elf64_Ehdr *elf_hdr, unsigned long *value)
 {
-    if (elf_hdr->e_type == ET_REL) *value += HAS_RELOC;
-    if (elf_hdr->e_type == ET_EXEC) *value += EXEC_P;
-    if (elf_hdr->e_type == ET_DYN) *value += DYNAMIC;
+    for (int i = 0; ELF_TYPE_FLAGS[i].flag; ++i)
+        if (elf_hdr->e_type == ELF_TYPE_FLAGS[i].e_type)
+            *value += ELF_TYPE_FLAGS[i].flag;
 
     Elf64_Shdr *sec_hdr_table = PTR_CREMENT(elf_hdr, elf_hdr->e_shoff);
 
     for (unsigned int i = 0; i < elf_hdr->e_shnum; ++i) {
         Elf64_Shdr *sec_hdr = &sec_hdr_table[i];
 
-        if (sec_hdr->sh_type == SHT_DYNAMIC && !(*value & D_PAGED))
-            *value += D_PAGED;
-        if (sec_hdr->sh_type == SHT_DYNSYM && !(*value & HAS_SYMS))
-            *value += HAS_SYMS;
-        if (sec_hdr->sh_type == SHT_SYMTAB && !(*value & HAS_SYMS))
-            *value += HAS_SYMS;
-
-        if (sec_hdr->sh_name == 0) continue;
-
-        char *sec_str = section_64_get_name(sec_hdr, elf_hdr);
-
-        if (strcmp(sec_str, ".debug") == 0) *value += HAS_DEBUG;
+        elf_64_flags_value_sec(elf_hdr, value, sec_hdr);
     }
 }
 
@@ -59,7 +66,8 @@ static void elf_64_flags(
     unsigned long size = 0;
 
     for (int i = 0; ELF_BFD_FLAGS[i].str; ++i)
-        if (*value & ELF_BFD_FLAGS[i].flag) size++;
+        if (*value & ELF_BFD_FLAGS[i].flag)
+            size++;
 
     *flags = malloc(sizeof(char *) * (size + 1));
 
@@ -83,32 +91,13 @@ void elf_64_print(const Elf64_Ehdr *elf_hdr, const char *path)
     printf("\n%s:     file format elf64-x86-64\n", path);
     printf("architecture: %s, flags 0x%.8lx:\n", architecture, value);
 
-    for (int i = 0; flags && (flags[i]); ++i) {
-        if (i) printf(", ");
+    for (int i = 0; flags && (flags[i]); ++i)
+        printf("%.*s%s", ((i) ? 2 : 0), ", ", flags[i]);
 
-        printf("%s", flags[i]);
-    }
-
-    if (flags == NULL) printf("NO_FLAGS");
+    if (flags == NULL)
+        printf("NO_FLAGS");
 
     printf("\nstart address 0x%.16lx\n\n", elf_hdr->e_entry);
 
     free(flags);
-}
-
-Elf64_Shdr *elf_64_get_section_header_by_name(
-    const Elf64_Ehdr *elf_hdr, const char *name)
-{
-    Elf64_Shdr *sec_hdr_table = PTR_CREMENT(elf_hdr, elf_hdr->e_shoff);
-    Elf64_Shdr *sec_hdr = NULL;
-    char *sec_str = NULL;
-
-    for (int i = 0; i < elf_hdr->e_shnum; ++i) {
-        sec_hdr = &sec_hdr_table[i];
-        sec_str = section_64_get_name(sec_hdr, elf_hdr);
-
-        if (strcmp(sec_str, name) == 0) return (sec_hdr);
-    }
-
-    return (NULL);
 }
