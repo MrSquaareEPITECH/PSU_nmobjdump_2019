@@ -100,7 +100,7 @@ void symbol_table_32_print(
         const char *str = &str_table[sym->st_name];
 
         if (sym->st_value)
-            printf("%.16lx %c %s\n", sym->st_value, type, str);
+            printf("%.16x %c %s\n", sym->st_value, type, str);
         else
             printf("%16c %c %s\n", ' ', type, str);
     }
