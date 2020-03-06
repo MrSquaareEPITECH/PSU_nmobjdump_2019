@@ -17,8 +17,7 @@ static void section_32_print_addr(const Elf32_Shdr *sec_hdr, unsigned long i)
     unsigned long max_addr = sec_hdr->sh_addr + sec_hdr->sh_size;
     int zeros = 0;
 
-    for (; max_addr; ++zeros, max_addr /= 0xf)
-        ;
+    for (; max_addr; ++zeros, max_addr /= 0xf) ;
 
     if (zeros < 4)
         zeros = 4;
