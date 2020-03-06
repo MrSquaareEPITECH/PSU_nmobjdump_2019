@@ -24,7 +24,7 @@ static int buffer_load(const char *path, char **buffer, unsigned long *size)
     struct stat stat;
 
     if (fd == -1) {
-        fprintf(stderr, "objdump: '%s': %s\n", path, strerror(errno));
+        fprintf(stderr, "objdump: '%s': No such file\n", path);
         return (FAILURE);
     }
     if (fstat(fd, &stat) == -1) {
