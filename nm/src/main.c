@@ -18,21 +18,33 @@
 #include "common/def.h"
 #include "common/file.h"
 
+static int stat_load(const char *path, unsigned long *size, int fd)
+{
+    struct stat stat;
+
+    if (fstat(fd, &stat) == -1) {
+        fprintf(stderr, "nm: '%s': %s\n", path, strerror(errno));
+        return (FAILURE);
+    }
+    if (S_ISDIR(stat.st_mode)) {
+        fprintf(stderr, "nm: Warning: '%s' is a directory\n", path);
+        return (FAILURE);
+    }
+    *size = stat.st_size;
+    return (SUCCESS);
+}
+
 static int buffer_load(const char *path, char **buffer, unsigned long *size)
 {
     int fd = open(path, O_RDONLY);
-    struct stat stat;
 
     if (fd == -1) {
         fprintf(stderr, "nm: '%s': No such file\n", path);
         return (FAILURE);
     }
-    if (fstat(fd, &stat) == -1) {
-        fprintf(stderr, "nm: '%s': %s\n", path, strerror(errno));
+    if (stat_load(path, size, fd))
         return (FAILURE);
-    }
-    *buffer = mmap(NULL, stat.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
-    *size = stat.st_size;
+    *buffer = mmap(NULL, *size, PROT_READ, MAP_PRIVATE, fd, 0);
     if (buffer == MAP_FAILED) {
         fprintf(stderr, "nm: '%s': %s\n", path, strerror(errno));
         return (FAILURE);
