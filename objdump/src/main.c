@@ -30,6 +30,11 @@ static int stat_load(const char *path, unsigned long *size, int fd)
         fprintf(stderr, "objdump: Warning: '%s' is a directory\n", path);
         return (FAILURE);
     }
+    if (!S_ISREG(stat.st_mode)) {
+        fprintf(stderr, "objdump: Warning: '%s' is not an ordinary file\n",
+            path);
+        return (FAILURE);
+    }
     *size = stat.st_size;
     return (SUCCESS);
 }
