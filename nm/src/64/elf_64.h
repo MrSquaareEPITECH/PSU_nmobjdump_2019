@@ -15,4 +15,4 @@ Elf64_Shdr *elf_64_get_section_header_by_name(
 Elf64_Shdr *elf_64_get_section_header_by_type(
     const Elf64_Ehdr *elf_hdr, Elf64_Word type);
 
-#endif  // NM_ELF_64_H
+#endif // NM_ELF_64_H

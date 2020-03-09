@@ -13,4 +13,4 @@
 void section_64_print(const Elf64_Shdr *sec_hdr, const Elf64_Ehdr *elf_hdr);
 char *section_64_get_name(const Elf64_Shdr *sec_hdr, const Elf64_Ehdr *elf_hdr);
 
-#endif  // OBJDUMP_SECTION_64_H
+#endif // OBJDUMP_SECTION_64_H

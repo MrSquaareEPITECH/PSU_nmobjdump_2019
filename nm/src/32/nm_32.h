@@ -12,4 +12,4 @@
 
 int nm_32(const char *path, Elf32_Ehdr *elf_header);
 
-#endif  // NM_NM_32_H
+#endif // NM_NM_32_H

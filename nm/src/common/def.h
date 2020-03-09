@@ -13,4 +13,4 @@
 #define SUCCESS (0)
 #define FAILURE (84)
 
-#endif  // NM_DEF_H
+#endif // NM_DEF_H

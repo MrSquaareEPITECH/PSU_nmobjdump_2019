@@ -13,4 +13,4 @@
 void section_32_print(const Elf32_Shdr *sec_hdr, const Elf32_Ehdr *elf_hdr);
 char *section_32_get_name(const Elf32_Shdr *sec_hdr, const Elf32_Ehdr *elf_hdr);
 
-#endif  // OBJDUMP_SECTION_32_H
+#endif // OBJDUMP_SECTION_32_H

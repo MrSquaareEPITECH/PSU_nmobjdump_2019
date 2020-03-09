@@ -12,4 +12,4 @@
 
 void elf_64_print(const Elf64_Ehdr *elf_hdr, const char *path);
 
-#endif  // OBJDUMP_ELF_64_H
+#endif // OBJDUMP_ELF_64_H

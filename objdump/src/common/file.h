@@ -17,4 +17,4 @@ enum ARCH { ARCH_UNKNOWN, ARCH_32, ARCH_64 };
 bool file_is_elf(const char *buffer);
 arch_t file_get_arch(const char *buffer);
 
-#endif  // OBJDUMP_FILE_H
+#endif // OBJDUMP_FILE_H

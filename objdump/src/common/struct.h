@@ -42,4 +42,4 @@ extern const elf_sec_name_flag_t ELF_SEC_NAME_FLAGS[];
 extern const elf_sec_type_flag_t ELF_SEC_TYPE_FLAGS[];
 extern const elf_bfd_flag_t ELF_BFD_FLAGS[];
 
-#endif  // OBJDUMP_STRUCT_H
+#endif // OBJDUMP_STRUCT_H

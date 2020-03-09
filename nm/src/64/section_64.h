@@ -12,4 +12,4 @@
 
 char *section_64_get_name(const Elf64_Shdr *sec_hdr, const Elf64_Ehdr *elf_hdr);
 
-#endif  // NM_SECTION_64_H
+#endif // NM_SECTION_64_H

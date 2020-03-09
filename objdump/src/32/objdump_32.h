@@ -12,4 +12,4 @@
 
 int objdump_32(const char *path, const Elf32_Ehdr *elf_hdr);
 
-#endif  // OBJDUMP_OBJDUMP_32_H
+#endif // OBJDUMP_OBJDUMP_32_H

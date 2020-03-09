@@ -31,4 +31,4 @@ extern const symbol_shndx_type_t SYM_SHNDX_TYPES[];
 extern const symbol_sec_name_type_t SYM_SEC_NAME_TYPES[];
 extern const symbol_sec_mask_type_t SYM_SEC_FLAGS_TYPES[];
 
-#endif  // NM_STRUCT_H
+#endif // NM_STRUCT_H

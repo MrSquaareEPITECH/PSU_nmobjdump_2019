@@ -17,4 +17,4 @@ void symbol_table_32_sort_indexes_alphabetically(
 void symbol_table_32_print(
     const Elf32_Ehdr *elf_hdr, const int *indexes, unsigned long size);
 
-#endif  // NM_SYMBOL_TABLE_32_H
+#endif // NM_SYMBOL_TABLE_32_H

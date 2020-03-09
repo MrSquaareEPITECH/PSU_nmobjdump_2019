@@ -12,4 +12,4 @@
 
 char symbol_64_get_type(const Elf64_Sym *sym, const Elf64_Ehdr *elf_header);
 
-#endif  // NM_SYMBOL_64_H
+#endif // NM_SYMBOL_64_H

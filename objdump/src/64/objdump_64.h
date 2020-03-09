@@ -12,4 +12,4 @@
 
 int objdump_64(const char *path, const Elf64_Ehdr *elf_hdr);
 
-#endif  // OBJDUMP_OBJDUMP_64_H
+#endif // OBJDUMP_OBJDUMP_64_H

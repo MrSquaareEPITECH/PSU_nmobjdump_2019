@@ -12,4 +12,4 @@
 
 void elf_32_print(const Elf32_Ehdr *elf_hdr, const char *path);
 
-#endif  // OBJDUMP_ELF_32_H
+#endif // OBJDUMP_ELF_32_H

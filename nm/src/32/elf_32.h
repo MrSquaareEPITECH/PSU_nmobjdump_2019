@@ -15,4 +15,4 @@ Elf32_Shdr *elf_32_get_section_header_by_name(
 Elf32_Shdr *elf_32_get_section_header_by_type(
     const Elf32_Ehdr *elf_hdr, Elf32_Word type);
 
-#endif  // NM_ELF_32_H
+#endif // NM_ELF_32_H

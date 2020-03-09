@@ -12,4 +12,4 @@
 
 int nm_64(const char *path, Elf64_Ehdr *elf_header);
 
-#endif  // NM_NM_64_H
+#endif // NM_NM_64_H

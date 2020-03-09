@@ -12,4 +12,4 @@
 
 char *section_32_get_name(const Elf32_Shdr *sec_hdr, const Elf32_Ehdr *elf_hdr);
 
-#endif  // NM_SECTION_32_H
+#endif // NM_SECTION_32_H

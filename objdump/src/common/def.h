@@ -13,4 +13,4 @@
 #define SUCCESS (0)
 #define FAILURE (84)
 
-#endif  // OBJDUMP_DEF_H
+#endif // OBJDUMP_DEF_H
